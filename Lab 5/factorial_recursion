@@ -1,0 +1,35 @@
+    AREA RESET, DATA, READONLY
+    EXPORT __Vectors
+
+__Vectors
+    DCD  0x10001000         
+    DCD  Reset_Handler
+    ALIGN
+
+    AREA mycode, CODE, READONLY
+    ENTRY
+    EXPORT Reset_Handler
+
+Reset_Handler
+    MOV R0, #5       ; Number to find the factorial of
+    BL Factorial     ; Call the recursive function
+    B STOP           ; Infinite loop to stop execution
+
+Factorial
+    CMP R0, #1       ; Base case: if (n == 1)
+    BEQ Base_Case    ; If R0 == 1, return 1
+
+    PUSH {LR, R0}    ; Save return address and current R0 (n) on stack
+    SUB R0, R0, #1   ; Compute (n-1)
+    BL Factorial     ; Recursive call: Factorial(n-1)
+    POP {R1, LR}     ; Restore previous R0 (n) and LR (return address)
+    MUL R0, R0, R1   ; Multiply result of Factorial(n-1) with n
+    BX LR            ; Return to caller
+
+Base_Case
+    MOV R0, #1       ; Factorial(1) = 1
+    BX LR            ; Return
+
+STOP
+    B STOP           ; Infinite loop to halt execution
+    END
