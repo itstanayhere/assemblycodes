@@ -1,0 +1,43 @@
+    AREA RESET, DATA, READONLY
+    EXPORT __Vectors
+__Vectors
+    DCD 0x40001000
+    DCD Reset_Handler
+    ALIGN
+
+    AREA ascend, CODE, READONLY
+    ENTRY
+    EXPORT Reset_Handler
+
+Reset_Handler
+    MOV R0, #2      ; a
+    MOV R1, #3      ; b
+    MOV R3, #1      ; i (starts at 1)
+
+LCM_LOOP
+    MUL R4, R3, R0  ; R4 = i * a
+    MOV R5, R4      ; Copy R4 to R5 for MOD operation
+    BL MODULO       ; Call MODULO function (R5 = R4 % R1)
+
+    CMP R5, #0      ; Check if remainder is 0
+    BEQ LCM_FOUND   ; If yes, exit loop (LCM found)
+
+    ADD R3, R3, #1  ; Else, i++
+    B LCM_LOOP      ; Repeat
+
+MODULO
+    CMP R5, R1      ; If R5 < R1, remainder is found
+    BLO RETURN_MOD  ; Exit if remainder is found
+    SUB R5, R5, R1  ; Else, subtract R1 from R5
+    B MODULO        ; Repeat
+
+RETURN_MOD
+    BX LR           ; Return from function
+
+LCM_FOUND
+    MUL R6, R3, R0  ; LCM = i * a (store in R6)
+
+STOP
+    B STOP          ; Infinite loop
+
+    END
